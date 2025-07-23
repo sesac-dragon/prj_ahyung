@@ -2,3 +2,4 @@ pandas
 selenium
 numpy
 BeautifulSoup4
+pymysql
