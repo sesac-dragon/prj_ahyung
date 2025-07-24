@@ -3,3 +3,4 @@ selenium
 numpy
 BeautifulSoup4
 pymysql
+streamlit

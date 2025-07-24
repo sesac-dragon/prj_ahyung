@@ -26,7 +26,7 @@ def insert_cafe_data(blog_data, env_path=".env"):
     )
     try:
         with conn.cursor() as cur:
-            sql = "INSERT INTO tb_cafe (logNo,cafename,cafeaddress,latitude,longitude,blogtext) VALUES (%s,%s,%s,%s,%s,%s)"
+            sql = "INSERT INTO tb_cafe (logNo,cafename,cafeaddress,latitude,longitude,blogtext,blogdate) VALUES (%s,%s,%s,%s,%s,%s,%s)"
 
             values = [
                 (
@@ -36,6 +36,7 @@ def insert_cafe_data(blog_data, env_path=".env"):
                     float(data["위도"]),
                     float(data["경도"]),
                     data["블로그내용"],
+                    data['블로그작성일']
                 )
                 for data in blog_data
             ]
@@ -47,7 +48,7 @@ def insert_cafe_data(blog_data, env_path=".env"):
 
 
 # 최신글
-def get_recent_logNos(limit=5, env_path=".env"):
+def get_latest_logNo(env_path=".env"):
     envs = load_env(env_path)
     conn = pymysql.connect(
         host=envs["DB_HOST"],
@@ -59,6 +60,6 @@ def get_recent_logNos(limit=5, env_path=".env"):
     )
 
     with conn.cursor(cursor=pymysql.cursors.DictCursor) as cur:
-        cur.execute(f"SELECT logNo FROM tb_cafe ORDER BY logNo LIMIT {limit}")
-        result = cur.fetchall()
-        return set(row["logNo"] for row in result)
+        cur.execute("SELECT logNo FROM tb_cafe ORDER BY blogdate DESC LIMIT 1")
+        result = cur.fetchone()
+        return result["logNo"] if result else None
