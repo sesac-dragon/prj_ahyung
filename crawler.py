@@ -72,18 +72,19 @@ def extract_blog_info(driver, blog_url):
             }
         except:
             print("지도정보 없음")
-
+            return None
     except Exception as e:
         print(f"오류 발생: {e}")
         return None
 
 
 # 최종 크롤링 함수
-def crawl_pages(pages=10, keyword="뜨개카페"):
+def crawl_pages(pages=10, keyword="뜨개카페", recent_lognos = None):
     driver = create_driver()
     cafe_list = []
 
-    for i in range(1, pages + 1):
+    
+    for i in range(1, pages+1): # 최신글이 1번
         print(f"[페이지 {i}] 블로그 링크 수집 중...")
         links = get_blog_links(driver, i, keyword)
         print(f" - 수집된 링크 {len(links)}개")
@@ -91,6 +92,11 @@ def crawl_pages(pages=10, keyword="뜨개카페"):
         for link in links:
             blog_info = extract_blog_info(driver, link)
             if blog_info:
+                log_no = blog_info["logNo"]
+                if recent_lognos and log_no in recent_lognos:
+                    print(f"중복 글 발견 : {log_no} - 크롤링중단")
+                    driver.quit()
+                    return cafe_list
                 cafe_list.append(blog_info)
 
     driver.quit()
